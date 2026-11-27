@@ -107,6 +107,74 @@ function ventasDelDia(ventas, fecha) {
   };
 }
 
+function totalVendidoInstrumentada(ventas, contador) {
+  let total = 0;
+  for (const venta of ventas) {
+    contador.ops += 1;
+    total += valorVenta(venta);
+  }
+  return total;
+}
+
+function ventaMayorInstrumentada(ventas, contador) {
+  if (ventas.length === 0) return null;
+  let mayor = ventas[0];
+  for (let i = 1; i < ventas.length; i += 1) {
+    contador.ops += 1;
+    if (valorVenta(ventas[i]) > valorVenta(mayor)) mayor = ventas[i];
+  }
+  return mayor;
+}
+
+function totalPorCiudadInstrumentada(ventas, contador) {
+  const totales = {};
+  for (const venta of ventas) {
+    contador.ops += 1;
+    const ciudad = mostrarNombreCiudad(venta.ciudad);
+    totales[ciudad] = (totales[ciudad] || 0) + valorVenta(venta);
+  }
+  return totales;
+}
+
+function primeraVenta(ventas) {
+  return ventas.length > 0 ? ventas[0] : null;
+}
+
+function primeraVentaInstrumentada(ventas, contador) {
+  contador.ops += 1;
+  return primeraVenta(ventas);
+}
+
+function clientesRecurrentes(ventas) {
+  const recurrentes = [];
+  for (let i = 0; i < ventas.length; i += 1) {
+    for (let j = i + 1; j < ventas.length; j += 1) {
+      if (ventas[i].cliente === ventas[j].cliente && !recurrentes.includes(ventas[i].cliente)) {
+        recurrentes.push(ventas[i].cliente);
+      }
+    }
+  }
+  return recurrentes;
+}
+
+function totalCiudadCadena(ventas, ciudad) {
+  const buscada = normalizar(ciudad);
+  return ventas
+    .map((venta) => ({ venta, ciudad: normalizar(venta.ciudad) }))
+    .filter((item) => item.ciudad === buscada)
+    .map((item) => valorVenta(item.venta))
+    .reduce((total, valor) => total + valor, 0);
+}
+
+function totalCiudadUnaPasada(ventas, ciudad) {
+  const buscada = normalizar(ciudad);
+  let total = 0;
+  for (const venta of ventas) {
+    if (normalizar(venta.ciudad) === buscada) total += valorVenta(venta);
+  }
+  return total;
+}
+
 module.exports = {
   valorVenta,
   totalVendido,
@@ -121,4 +189,12 @@ module.exports = {
   unidadesPorProducto,
   topProductosPorValor,
   ventasDelDia,
+  totalVendidoInstrumentada,
+  ventaMayorInstrumentada,
+  totalPorCiudadInstrumentada,
+  primeraVenta,
+  primeraVentaInstrumentada,
+  clientesRecurrentes,
+  totalCiudadCadena,
+  totalCiudadUnaPasada,
 };
